@@ -95,3 +95,6 @@ def link(idlink):
         #user_agent = request.headers.get('User-Agent')
         return "Przekazano nieznany link: {}".format(idlink)
 
+
+if __name__ == '__main__':
+    app.run(debug=True)
