@@ -1,4 +1,4 @@
-# bywayurl
+# myshortURL
 Little URL shortener. Python + Flask. For fun and learning.
 Version 0.1
 
