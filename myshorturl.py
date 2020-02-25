@@ -17,6 +17,7 @@ db = SQLAlchemy(app)
 
 
 class Link(db.Model):
+    """ Link table """
     __tablename__ = 'link'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -34,6 +35,10 @@ class Link(db.Model):
 
 
 def random_short(lenght=10):
+    """ 
+    Metoda generuje losowy ciąg znaków o zadanie długości, 
+    który będzie wykorzystany jako identyfikator skrótu 
+    """
     lista = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
              't', 'u', 'w', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     max = len(lista)
@@ -45,6 +50,9 @@ def random_short(lenght=10):
 
 
 def verify_short(t_short):
+    """ 
+    Weryfikacja czy podany skrót jest nowym nieistniejącym w bazie skrótrem 
+    """
     test_link = Link.query.filter_by(idlink=t_short).first()
     if test_link != None:
         return False
@@ -53,6 +61,9 @@ def verify_short(t_short):
 
 
 def create_short():
+    """
+    Metoda tworzy nowy skrót
+    """
     short = ""
     while True:
         short = random_short()
