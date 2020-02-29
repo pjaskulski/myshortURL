@@ -1,6 +1,12 @@
 # aplikacja myshortURL
-from flask import Flask, redirect, request, render_template, make_response, jsonify, escape
+from flask import Flask, redirect, request, render_template, make_response, jsonify, escape, abort
+from flask import url_for
+from flask import session
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import FlaskForm
+from flask_bootstrap import Bootstrap
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired
 import os
 from random import randrange
 from urllib.parse import unquote
@@ -13,7 +19,9 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
     os.path.join(basedir, 'links.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'this jacket is blue'
 db = SQLAlchemy(app)
+bootstrap = Bootstrap(app)
 
 
 class Link(db.Model):
@@ -32,6 +40,11 @@ class Link(db.Model):
 
     def __repr__(self):
         return "<Link({}, {}, {})>".format(self.idlink, self.adres, self.title)
+
+
+class IndexForm(FlaskForm):
+    adres = StringField('URL Address', validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
 
 def random_short(lenght=10):
@@ -73,9 +86,37 @@ def create_short():
     return short
 
 
-@app.route('/')
-def hello_world():
-    return 'Serwis myshortURL'
+def short_from_adres(adres):
+    my_adres = unquote(adres)
+    if not my_adres.startswith('http'):
+        my_adres = 'http://' + my_adres
+    idlink = create_short()
+    my_link = Link(idlink, my_adres)
+    db.session.add(my_link)
+    db.session.commit()
+    return idlink
+
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    form = IndexForm()
+    myserver = request.host_url
+    if form.validate_on_submit():
+        adres = form.adres.data
+        if 'adres' not in session or session['adres'] != adres:
+            new_link = short_from_adres(adres)
+            session['adres'] = adres
+            session['link'] = new_link
+            return render_template('link.html', adres=form.adres.data, new_link=myserver+new_link)
+        else:
+            return render_template('link.html', adres=session.get('adres'), new_link=myserver+session.get('link'))
+
+    return render_template('index.html', form=form)
+
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 
 @app.route('/api/create-link')
@@ -104,6 +145,7 @@ def link(idlink):
         return redirect(test_link.adres)
     else:
         #user_agent = request.headers.get('User-Agent')
+
         return "Przekazano nieznany link: {}".format(idlink)
 
 

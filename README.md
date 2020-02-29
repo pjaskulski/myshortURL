@@ -1,5 +1,5 @@
 # myshortURL
-Little URL shortener. Python + Flask. For fun and learning.
+Little URL shortener. Python + Flask + Flask-Bootstrap + SQLAlchemy. For fun and learning.
 Version 0.1
 
 ## Description

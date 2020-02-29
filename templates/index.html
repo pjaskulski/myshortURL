@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}myShortURL{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>myShortURL</h1>
+</div>
+{{ wtf.quick_form(form, button_map={'submit':'warning'}) }}
+<p class="mt-5">{% if new_link %}{{ new_link }}{% else %}{% endif %}</p>
+{% endblock %}
