@@ -13,3 +13,5 @@ MIT
 ![Screen](/doc/main.png)
 
 ![Screen](/doc/link.png)
+
+![Screen](/doc/stat.png)

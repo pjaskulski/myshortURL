@@ -209,5 +209,19 @@ def link(idlink):
         return render_template('unknown.html', idlink=myserver+idlink)
 
 
+@app.route('/stat/<idlink>')
+def stat(idlink):
+    """
+    view stat for short-link
+    """
+    test_link = Link.query.filter_by(idlink=idlink).first()
+    if test_link != None:
+        stats = StatLink.query.filter_by(link_id=test_link.id).all()
+        return render_template('stat.html', stats=stats)
+    else:
+        myserver = request.host_url
+        return render_template('unknown.html', idlink=myserver+idlink)
+
+
 if __name__ == '__main__':
     app.run(debug=True)

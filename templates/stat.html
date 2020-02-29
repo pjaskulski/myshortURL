@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}myShortURL{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>myShortURL</h1>
+</div>
+<h3 class="display-3">Link use history</h3>
+
+<table class="table">
+    <tr>
+        <th>#</th>
+        <th>date</th>
+        <th>remote_ip</th>
+    </tr>
+    {% for stat in stats %}
+    <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ stat.date }}</td>
+        <td>{{ stat.remote_ip }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
