@@ -1,9 +1,9 @@
-from bywayurl import db, Link
+from myshorturl import db, Link
 import os
 from urllib.parse import unquote
 
 
-basedir = os.path.abspath(os.path.dirname(__file__))            
+basedir = os.path.abspath(os.path.dirname(__file__))
 if not os.path.exists(os.path.join(basedir, 'links.db')):
     db.create_all()
     idlink = 'qwertyuiop'

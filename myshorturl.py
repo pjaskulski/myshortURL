@@ -1,4 +1,4 @@
-# aplikacja myshortURL
+# app myshortURL
 from flask import Flask, redirect, request, render_template, make_response, jsonify, escape, abort
 from flask import url_for
 from flask import session
@@ -25,7 +25,7 @@ bootstrap = Bootstrap(app)
 
 
 class Link(db.Model):
-    """ Link table """
+    """Link table definition"""
     __tablename__ = 'link'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -43,14 +43,15 @@ class Link(db.Model):
 
 
 class IndexForm(FlaskForm):
+    """Definition of form
+    """
     adres = StringField('URL Address', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 
 def random_short(lenght=10):
-    """ 
-    Metoda generuje losowy ciąg znaków o zadanie długości, 
-    który będzie wykorzystany jako identyfikator skrótu 
+    """The method generates a random string of characters of a given length, 
+    which will be used as a shortcut identifier 
     """
     lista = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
              't', 'u', 'w', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
@@ -63,8 +64,7 @@ def random_short(lenght=10):
 
 
 def verify_short(t_short):
-    """ 
-    Weryfikacja czy podany skrót jest nowym nieistniejącym w bazie skrótrem 
+    """Verification whether the short-link given is a new one that does not exist in the database
     """
     test_link = Link.query.filter_by(idlink=t_short).first()
     if test_link != None:
@@ -74,8 +74,7 @@ def verify_short(t_short):
 
 
 def create_short():
-    """
-    Metoda tworzy nowy skrót
+    """method generates a new short-link
     """
     short = ""
     while True:
@@ -87,6 +86,11 @@ def create_short():
 
 
 def short_from_adres(adres):
+    """create short-link from url
+
+    parameter: 
+        adres - url
+    """
     my_adres = unquote(adres)
     if not my_adres.startswith('http'):
         my_adres = 'http://' + my_adres
@@ -99,6 +103,8 @@ def short_from_adres(adres):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    """index - website homepage, form for creating a shor-link 
+    """
     form = IndexForm()
     myserver = request.host_url
     if form.validate_on_submit():
@@ -116,11 +122,15 @@ def index():
 
 @app.route('/about')
 def about():
+    """Displays page about the service
+    """
     return render_template('about.html')
 
 
 @app.route('/api/create-link')
 def api_create_link():
+    """Create new short-link by api
+    """
     headers = {"Content-Type": "application/json"}
     if 'url' in request.args:
         adres = request.args['url']
@@ -140,13 +150,15 @@ def api_create_link():
 
 @app.route('/<idlink>')
 def link(idlink):
+    """
+    redirect from short-link to destination
+    """
     test_link = Link.query.filter_by(idlink=idlink).first()
     if test_link != None:
         return redirect(test_link.adres)
     else:
-        #user_agent = request.headers.get('User-Agent')
-
-        return "Przekazano nieznany link: {}".format(idlink)
+        myserver = request.host_url
+        return render_template('unknown.html', idlink=myserver+idlink)
 
 
 if __name__ == '__main__':
