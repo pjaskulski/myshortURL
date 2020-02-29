@@ -7,9 +7,11 @@ from flask_wtf import FlaskForm
 from flask_bootstrap import Bootstrap
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
+from flask_migrate import Migrate
 import os
 from random import randrange
 from urllib.parse import unquote
+from datetime import datetime
 
 
 app = Flask(__name__,
@@ -22,6 +24,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'this jacket is blue'
 db = SQLAlchemy(app)
 bootstrap = Bootstrap(app)
+migrate = Migrate(app, db)
 
 
 class Link(db.Model):
@@ -32,19 +35,59 @@ class Link(db.Model):
     idlink = db.Column(db.String(10), unique=True, nullable=False)
     adres = db.Column(db.String(255), unique=False, nullable=False)
     title = db.Column(db.String(255), unique=False, nullable=True)
+    users_id = db.Column(db.Integer, db.ForeignKey(
+        'users.id'), unique=False, nullable=True)
+    statlink = db.relationship('StatLink', backref='statlink')
 
-    def __init__(self, idlink, adres, title=""):
+    def __init__(self, idlink, adres, title="", users_id=None):
         self.idlink = idlink
         self.adres = adres
         self.title = title
+        self.users_id = None
 
     def __repr__(self):
         return "<Link({}, {}, {})>".format(self.idlink, self.adres, self.title)
 
 
+class Users(db.Model):
+    """Users table definition"""
+    __tablename__ = "users"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=False, nullable=False)
+    password = db.Column(db.String(100), unique=False, nullable=False)
+    email = db.Column(db.String(255), unique=False, nullable=False)
+    link = db.relationship('Link', backref='user')
+
+    def __init__(self, name, password, email):
+        self.name = name
+        self.passoword = password
+        self.email = email
+
+    def __repr__(self):
+        return "<User({}, {})>".format(self.name, self.email)
+
+
+class StatLink(db.Model):
+    """StatLink table definition"""
+    __tablename__ = "statlink"
+
+    id = db.Column(db.Integer, primary_key=True)
+    link_id = db.Column(db.Integer, db.ForeignKey('link.id'))
+    date = db.Column(db.DateTime)
+    remote_ip = db.Column(db.String(25), unique=False, nullable=True)
+
+    def __init__(self, link_id, date, remote_ip):
+        self.link_id = link_id
+        self.date = date
+        self.remote_ip = remote_ip
+
+    def __repr__(self):
+        return "<StatLink({}, {}, {})>".format(self.link_id, self.date, self.clientip)
+
+
 class IndexForm(FlaskForm):
-    """Definition of form
-    """
+    """Form for entering a URL"""
     adres = StringField('URL Address', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
@@ -155,6 +198,11 @@ def link(idlink):
     """
     test_link = Link.query.filter_by(idlink=idlink).first()
     if test_link != None:
+        remote_ip = request.remote_addr
+        stat_link = StatLink(test_link.id, datetime.now(), remote_ip)
+        db.session.add(stat_link)
+        db.session.commit()
+
         return redirect(test_link.adres)
     else:
         myserver = request.host_url
