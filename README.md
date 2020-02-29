@@ -9,3 +9,7 @@ A small mechanism to create shorter links.
 ## Licence
 
 MIT
+
+![Screen](/doc/main.png)
+
+![Screen](/doc/link.png)
