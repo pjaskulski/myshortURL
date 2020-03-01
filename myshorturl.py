@@ -21,7 +21,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
     os.path.join(basedir, 'links.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'this jacket is blue'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 db = SQLAlchemy(app)
 bootstrap = Bootstrap(app)
 migrate = Migrate(app, db)
@@ -193,8 +193,7 @@ def api_create_link():
 
 @app.route('/<idlink>')
 def link(idlink):
-    """
-    redirect from short-link to destination
+    """redirect from short-link to destination
     """
     test_link = Link.query.filter_by(idlink=idlink).first()
     if test_link != None:
@@ -211,8 +210,7 @@ def link(idlink):
 
 @app.route('/stat/<idlink>')
 def stat(idlink):
-    """
-    view stat for short-link
+    """view stat for short-link
     """
     test_link = Link.query.filter_by(idlink=idlink).first()
     if test_link != None:
