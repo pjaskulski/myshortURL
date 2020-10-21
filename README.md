@@ -5,6 +5,7 @@ Version 0.1
 ## Description
 
 A small mechanism to create shorter links. Python + Flask + Flask-Bootstrap + SQLAlchemy. For fun and learning.
+Build and deploy test app using Docker.
 
 ## Licence
 
