@@ -19,7 +19,7 @@ app = Flask(__name__,
             static_folder="static")
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
-    os.path.join(basedir, 'links.sqlite')
+    os.path.join(basedir,'db', 'links.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 db = SQLAlchemy(app)
@@ -196,7 +196,7 @@ def link(idlink):
     """redirect from short-link to destination
     """
     test_link = Link.query.filter_by(idlink=idlink).first()
-    if test_link != None:
+    if test_link:
         remote_ip = request.remote_addr
         stat_link = StatLink(test_link.id, datetime.now(), remote_ip)
         db.session.add(stat_link)
@@ -213,7 +213,7 @@ def stat(idlink):
     """view stat for short-link
     """
     test_link = Link.query.filter_by(idlink=idlink).first()
-    if test_link != None:
+    if test_link:
         stats = StatLink.query.filter_by(link_id=test_link.id).all()
         return render_template('stat.html', stats=stats)
     else:
@@ -222,4 +222,5 @@ def stat(idlink):
 
 
 if __name__ == '__main__':
+    print("App started...")
     app.run(debug=True)

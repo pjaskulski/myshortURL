@@ -1,0 +1,19 @@
+version: "3.5"
+services:
+  myshorturl:
+    build: .
+    ports:
+      - target: 5000
+        published: 5000
+    networks:
+      - myshorturl-net
+    volumes:
+      - type: volume
+        source: myshorturl_volume
+        target: /myshorturl
+
+networks:
+  myshorturl-net:
+
+volumes:
+  myshorturl_volume:
